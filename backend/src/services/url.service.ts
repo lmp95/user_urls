@@ -37,9 +37,10 @@ const retriveFullUrl = async (shortCode: string): Promise<string> => {
   // check cache exists
   let url: any;
   if (cache.has(shortCode)) {
-    return cache.get(shortCode);
+    url = cache.get(shortCode);
   } else {
-    url = await UrlModel.findOne({ shortCode: shortCode });
+    const result = await UrlModel.findOne({ shortCode: shortCode });
+    url = result.fullUrl;
     // cache url
     cache.set(shortCode, url.fullUrl);
     if (!url) {
@@ -50,7 +51,7 @@ const retriveFullUrl = async (shortCode: string): Promise<string> => {
     { _id: url._id },
     { numberOfHits: url.numberOfHits + 1 }
   );
-  return url.fullUrl;
+  return url;
 };
 
 /**
