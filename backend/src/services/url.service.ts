@@ -35,23 +35,21 @@ const generateShortUrl = async (data: any): Promise<UrlInterface> => {
  */
 const retriveFullUrl = async (shortCode: string): Promise<string> => {
   // check cache exists
-  let url: any;
-  if (cache.has(shortCode)) {
-    url = cache.get(shortCode);
-  } else {
-    const result = await UrlModel.findOne({ shortCode: shortCode });
-    url = result.fullUrl;
-    // cache url
-    cache.set(shortCode, url);
-    if (!url) {
-      throw new ApiError(400, 'Url not found');
-    }
-  }
+  const url = await UrlModel.findOne({ shortCode: shortCode });
   await UrlModel.updateOne(
     { _id: url._id },
     { numberOfHits: url.numberOfHits + 1 }
   );
-  return url;
+  if (cache.has(shortCode)) {
+    return cache.get(shortCode);
+  } else {
+    if (!url) {
+      throw new ApiError(400, 'Url not found');
+    }
+    // cache url
+    cache.set(shortCode, url);
+  }
+  return url.fullUrl;
 };
 
 /**
