@@ -42,7 +42,7 @@ const retriveFullUrl = async (shortCode: string): Promise<string> => {
     const result = await UrlModel.findOne({ shortCode: shortCode });
     url = result.fullUrl;
     // cache url
-    cache.set(shortCode, url.fullUrl);
+    cache.set(shortCode, url);
     if (!url) {
       throw new ApiError(400, 'Url not found');
     }
